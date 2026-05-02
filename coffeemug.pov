@@ -1,4 +1,4 @@
-/* coffeemug.pov version 2.0.1A
+/* coffeemug.pov version 2.0.2-rc.1 2026-May-02
  * Persistence of Vision Raytracer scene description file
  * POV-Ray Object Collection demo
  *
@@ -10,19 +10,19 @@
  *   3 - Masked texture
  *   4 - Non-masked texture
  *
- * Copyright (C) 2008 - 2021 Richard Callwood III.  Some rights reserved.
- * This file is licensed under the terms of the CC-LGPL
- * a.k.a. the GNU Lesser General Public License version 2.1.
+ * Copyright (C) 2008 - 2026 Richard Callwood III.  Some rights reserved.
+ * This file is licensed under the terms of the GNU-LGPL.
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License version 2.1 as published by the Free Software Foundation.
+ * This library is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  Please
- * visit https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html for
- * the text of the GNU Lesser General Public License version 2.1.
+ * visit https://www.gnu.org/licenses/lgpl-3.0.html for the text
+ * of the GNU Lesser General Public License version 3.
  *
  * Vers.  Date         Comments
  * -----  ----         --------
@@ -42,12 +42,15 @@
  *        2019-Apr-10  The gold texture is made shinier.
  * 2.0.1  2019-Apr-13  The #default reflection is restored following the wood
  *                     definitions.
- * 2.0.1A 2021-Aug-14  The license text is updated.
+ *        2024-Dec-28  The #version is preserved between 3.5 and 3.8.
+ *        2024-Dec-28  The image map gamma is specified for POV-Ray >= 3.7.
+ *        2026-May-02  The diffuse level is considered for the wood ambient.
+ * 2.0.2  2026-May-02  The license is upgraded to LGPL 3.
  */
 // (If rendering into your Object Collection folder, then be sure not to omit
 // the trailing underscore below.)
 // +KFF4 +Ocoffeemug_
-#version 3.5;
+#version max (3.5, min (3.8, version)); // Bracket the POV version.
 
 #ifndef (Ph) #declare Ph = off; #end // photons
 #ifndef (Rad) #declare Rad = off; #end // radiosity
@@ -58,11 +61,12 @@
   #ifndef (Texture) #declare Texture = 4; #end
 #end
 #declare C_SKY = rgb 0.1;
+#declare DIFFUSE = 0.6; // POV-Ray's default diffuse
 
 #default // for wood texture only
 { finish
   { reflection { 0 0.2 fresnel } conserve_energy
-    ambient (Rad? 0: C_SKY)
+    ambient (Rad? 0: C_SKY * DIFFUSE)
   }
 }
 #include "colors.inc" // required by woodmaps.inc 3.5/3.6
@@ -109,7 +113,6 @@ background { C_SKY }
 #declare Illumination = vdot (vnormalize (LIGHT_POSITION), y);
 #declare c_Table = rgb <0.295, 0.163, 0.118>; // sampled from T_Wood12
 #declare LIT = 0.8; // estimate of contribution of spotlit portion of the table
-#declare DIFFUSE = 0.6; // this scene's diffuse (which is the POV-Ray default)
 #declare Ambience =
 ( Rad?
   0:
@@ -137,7 +140,11 @@ plane
 #declare p_Image = pigment
 {// Note:  For POV-Ray 3.5/3.6 compatibility,
  // coffeemug_map.jpg was rendered with File_Gamma=1.
-  image_map { jpeg "coffeemug_map" interpolate 2 }
+  image_map
+  { jpeg "coffeemug_map"
+    #if (version >=3.7) gamma 1.0 #end
+    interpolate 2
+  }
   translate -0.5 // image must be centered on the origin
   scale 2.5
 }

@@ -1,22 +1,22 @@
-/* coffeemug.inc version 2.0.1A
+/* coffeemug.inc version 2.0.2-rc.1 2026-May-02
  * Persistence of Vision Raytracer include file
  * POV-Ray Object Collection
  *
  * A coffee mug, with available (untextured) beverage object.
  *
- * Copyright (C) 2008 - 2021 Richard Callwood III.  Some rights reserved.
- * This file is licensed under the terms of the CC-LGPL
- * a.k.a. the GNU Lesser General Public License version 2.1.
+ * Copyright (C) 2008 - 2026 Richard Callwood III.  Some rights reserved.
+ * This file is licensed under the terms of the GNU-LGPL.
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License version 2.1 as published by the Free Software Foundation.
+ * This library is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  Please
- * visit https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html for
- * the text of the GNU Lesser General Public License version 2.1.
+ * visit https://www.gnu.org/licenses/lgpl-3.0.html for the text
+ * of the GNU Lesser General Public License version 3.
  *
  * Vers.  Date         Comments
  * -----  ----         --------
@@ -32,7 +32,7 @@
  *                     a faster solution.
  *        2015-Feb-21  The bottom of the mug is redesigned, and a stack height
  *                     macro is added.
- *        2015-Feb-??  A version identifier is added.
+ *        2015-Feb-??  A CoffeeMug version identifier is added.
  *        2015-Feb-28  The pigment and texture macros are rewritten to map
  *                     general pigments and textures cylindrically, not just the
  *                     object masks.
@@ -40,17 +40,19 @@
  *                     code is edited accordingly in many places, to improve
  *                     compactness and readability.
  * 2.0.1  2019-Apr-13  View_POV_Include_Stack is utilized.
- * 2.0.1A 2021-Aug-14  The license text is updated.
+ *        2024-Dec-28  The #version is preserved between 3.5 and 3.8.
+ *        2024-Dec-28  New synonyms are added for CoffeeMug_Stack_height().
+ * 2.0.2  2026-May-02  The license is upgraded to LGPL 3.
  *
  * Implementation note: due to POV-Ray namespace scope leakage, local variables
  * and function parameters (other than x, y, and z) *must* be prefixed.
  */
 #ifndef (CoffeeMug_Inc_Temp) #declare CoffeeMug_Inc_Temp = version;
-#version 3.5;
+#version max (3.5, min (3.8, version)); // Bracket the POV version.
 
-#declare COFFEEMUG_VERSION = 2.01;
+#declare COFFEEMUG_VERSION = 2.02;
 #ifdef (View_POV_Include_Stack)
-  #debug "#include \"coffeemug.inc\" //version 2.0.1A\n"
+  #debug "#include \"coffeemug.inc\" //version 2.0.2-rc.1\n"
 #end
 
 //----------------------- PUBLIC VALUES AND PARAMETERS -------------------------
@@ -120,7 +122,8 @@
     torus { RMajor, rMinor }
   #end
 #end
-// Note:  The internal function coffeemug__fn_Meniscus() has been deleted.
+
+// Note:  The private function coffeemug__fn_Meniscus() has been deleted.
 // If you need that functionality, please use function RE_fn_Wheel() in the
 // RoundEdge module of the Object Collection.
 
@@ -149,7 +152,7 @@
 
 //----------------------------------------------------------
 
-#macro CoffeeMug_Stack_height (Radius, Wall, Capacity, Units)
+#macro CoffeeMug_Stack_Height (Radius, Wall, Capacity, Units)
 ( #local mug_Wall = (Wall? Wall: Radius * MUG__WALL);
   Mug__Net_height (Radius - mug_Wall, mug_Wall, Capacity, Units)
   + mug_Wall * (MUG__FLOOR - 0.5 - MUG__RFOOT)
@@ -474,7 +477,7 @@
   }
 #end
 
-//======================== SHORT-PREFIX ALTERNATIVES ===========================
+//================================= SYNONYMS ===================================
 
 #declare MUG_HEIGHT = COFFEEMUG_HEIGHT;
 #declare MUG_INCH = COFFEEMUG_INCH;
@@ -486,8 +489,16 @@
   CoffeeMug_Height (Radius, Capacity, Units)
 #end
 
+#macro Mug_Stack_Height (Radius, Wall, Capacity, Units)
+  CoffeeMug_Stack_Height (Radius, Wall, Capacity, Units)
+#end
+
 #macro Mug_Stack_height (Radius, Wall, Capacity, Units)
-  CoffeeMug_Stack_height (Radius, Wall, Capacity, Units)
+  CoffeeMug_Stack_Height (Radius, Wall, Capacity, Units)
+#end
+
+#macro CoffeeMug_Stack_height (Radius, Wall, Capacity, Units)
+  CoffeeMug_Stack_Height (Radius, Wall, Capacity, Units)
 #end
 
 #macro Mug_Mug (Radius, Capacity, Units, Use_merge)
